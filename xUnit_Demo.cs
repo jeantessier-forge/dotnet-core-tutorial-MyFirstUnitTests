@@ -3,9 +3,19 @@ using Xunit;
  
 namespace xUnit_Test
 {
-    public class xUnit_Tests : IDisposable
+    public class Callable
     {
-        public xUnit_Tests()
+        public int CallCount { get; private set; }
+
+        public void Call()
+        {
+            CallCount = CallCount + 1;
+        }
+    }
+
+    public class CallableFixture : Callable, IDisposable
+    {
+        public CallableFixture()
         {
             Console.WriteLine("Inside Fixture Constructor");
         }
@@ -16,17 +26,24 @@ namespace xUnit_Test
         }
     }
  
-    public class UnitTest_1 : IClassFixture<xUnit_Tests>, IDisposable
+    public class UnitTest_1 : Callable, IClassFixture<CallableFixture>, IDisposable
     {
-        public UnitTest_1()
+        private CallableFixture fixture;
+
+        public UnitTest_1(CallableFixture fixture)
         {
+            this.fixture = fixture;
             Console.WriteLine("Inside UnitTest_1 Constructor");
         }
 
-        [Fact]
-        public void Test_1()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void Test_1(int testNumber)
         {
-            Console.WriteLine("Inside Test_1");
+            fixture.Call();
+            Call();
+            Console.WriteLine($"Inside Test_1 #{testNumber}: this.CallCount = {this.CallCount}, fixture.CallCount = {fixture.CallCount}");
         }
  
         public void Dispose()
@@ -35,17 +52,24 @@ namespace xUnit_Test
         }
     }
 
-    public class UnitTest_2 : IClassFixture<xUnit_Tests>, IDisposable
+    public class UnitTest_2 : Callable, IClassFixture<CallableFixture>, IDisposable
     {
-        public UnitTest_2()
+        private CallableFixture fixture;
+
+        public UnitTest_2(CallableFixture fixture)
         {
+            this.fixture = fixture;
             Console.WriteLine("Inside UnitTest_2 Constructor");
         }
 
-        [Fact]
-        public void Test_2()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void Test_2(int testNumber)
         {
-            Console.WriteLine("Inside Test_2");
+            fixture.Call();
+            Call();
+            Console.WriteLine($"Inside Test_2 #{testNumber}: this.CallCount = {this.CallCount}, fixture.CallCount = {fixture.CallCount}");
         }
  
         public void Dispose()
