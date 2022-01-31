@@ -1,0 +1,84 @@
+@startuml
+
+skinparam style strictuml
+'hide footbox
+
+control runner
+participant "__CallableFixture__" as fixture1
+participant "__CallableFixture__" as fixture2
+participant "__1 : UnitTest_1__" as t11 
+participant "__2 : UnitTest_1__" as t12
+participant "__1 : UnitTest_2__" as t21 
+participant "__2 : UnitTest_2__" as t22
+participant console
+
+activate runner
+
+runner --> fixture1 ** : new
+runner --> fixture2 ** : new
+
+runner --> t22 ** : new
+runner --> t11 ** : new
+
+runner --> t11 ++ : run
+t11 --> fixture1 ++ : Call
+deactivate fixture1
+t11 --> t11 ++ : Call
+deactivate t11
+t11 --> t11 ++ : CallCount
+return 1
+t11 --> fixture1 ++ : CallCount
+return 1
+t11 --> console -- : write #1, 1, 1
+
+runner --> t22 ++ : run
+t22 --> fixture2 ++ : Call
+deactivate fixture2
+t22 --> t22 ++ : Call
+deactivate t22
+t22 --> t22 ++ : CallCount
+return 1
+t22 --> fixture2 ++ : CallCount
+return 1
+t22 --> console -- : write #2, 1, 1
+
+runner --> t22 !! : Dispose
+runner --> t11 !! : Dispose
+
+runner --> t21 ** : new
+
+runner --> t21 ++ : run
+t21 --> fixture2 ++ : Call
+deactivate fixture2
+t21 --> t21 ++ : Call
+deactivate t21
+t21 --> t21 ++ : CallCount
+return 1
+t21 --> fixture2 ++ : CallCount
+return 2
+t21 --> console -- : write #1, 1, 2
+
+runner --> t12 ** : new
+
+runner --> t21 !! : Dispose
+
+runner --> t12 ++ : run
+t12 --> fixture1 ++ : Call
+deactivate fixture1
+t12 --> t12 ++ : Call
+deactivate t12
+t12 --> t12 ++ : CallCount
+return 1
+t12 --> fixture1 ++ : CallCount
+return 2
+t12 --> console -- : write #2, 1, 2
+
+runner --> t12 !! : Dispose
+
+runner --> fixture1 !! : Dispose
+
+runner --> fixture2 !! : Dispose
+
+deactivate runner
+
+@enduml
